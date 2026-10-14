@@ -237,4 +237,8 @@ Python < 3.11 this needs tomli, which is now a dependency.
 
 ## AI agent's answer (paste here)
 
-_Not filled in yet. Paste everything above the "Expected output (y)" heading into an AI assistant, then paste its answer here and note which assistant and model you used._
+```
+feat(budget): add support for monthly budget limits
+
+Allow users to define category-specific monthly spending limits via a TOML configuration file and display warnings in the report command when limits are exceeded.
+```
