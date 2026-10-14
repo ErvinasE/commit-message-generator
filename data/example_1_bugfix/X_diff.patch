@@ -1,0 +1,13 @@
+diff --git a/spendlog/report.py b/spendlog/report.py
+index 9cbf862..e295049 100644
+--- a/spendlog/report.py
++++ b/spendlog/report.py
+@@ -6,7 +6,7 @@ from spendlog.models import Expense
+ def monthly_totals(expenses: list[Expense], year: int, month: int) -> dict[str, float]:
+     totals: dict[str, float] = defaultdict(float)
+     for e in expenses:
+-        if e.day.month == month:
++        if e.day.year == year and e.day.month == month:
+             totals[e.category] += e.amount
+     return dict(sorted(totals.items()))
+ 

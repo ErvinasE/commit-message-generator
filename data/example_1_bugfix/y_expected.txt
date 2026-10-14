@@ -1,0 +1,4 @@
+fix(report): only count expenses from the requested year
+
+monthly_totals compared only the month, so the report for 2026-03
+also included March expenses from earlier years.

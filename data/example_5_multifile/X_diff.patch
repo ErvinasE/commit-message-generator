@@ -1,0 +1,114 @@
+diff --git a/budgets.example.toml b/budgets.example.toml
+new file mode 100644
+index 0000000..670ed9d
+--- /dev/null
++++ b/budgets.example.toml
+@@ -0,0 +1,5 @@
++# Copy this file to budgets.toml and adjust the monthly limits.
++[budgets]
++food = 300
++transport = 80
++fun = 120
+diff --git a/pyproject.toml b/pyproject.toml
+index 8bc0637..4a20541 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -3,6 +3,9 @@ name = "spendlog"
+ version = "0.1.0"
+ description = "A tiny command-line expense tracker"
+ requires-python = ">=3.10"
++dependencies = [
++    "tomli>=2.0; python_version < '3.11'",
++]
+ 
+ [project.scripts]
+ spendlog = "spendlog.cli:main"
+diff --git a/spendlog/budget.py b/spendlog/budget.py
+new file mode 100644
+index 0000000..7763985
+--- /dev/null
++++ b/spendlog/budget.py
+@@ -0,0 +1,25 @@
++import sys
++from pathlib import Path
++
++if sys.version_info >= (3, 11):
++    import tomllib
++else:
++    import tomli as tomllib
++
++
++def load_budgets(path: Path) -> dict[str, float]:
++    """Read per-category monthly limits from the [budgets] table of a TOML file."""
++    if not path.exists():
++        return {}
++    with path.open("rb") as f:
++        data = tomllib.load(f)
++    return {category: float(limit) for category, limit in data.get("budgets", {}).items()}
++
++
++def over_budget(totals: dict[str, float], budgets: dict[str, float]) -> dict[str, float]:
++    """Return how far each category is over its limit, only for categories that exceed it."""
++    return {
++        category: round(totals[category] - limit, 2)
++        for category, limit in budgets.items()
++        if totals.get(category, 0.0) > limit
++    }
+diff --git a/spendlog/cli.py b/spendlog/cli.py
+index 134a9fc..2fed5bd 100644
+--- a/spendlog/cli.py
++++ b/spendlog/cli.py
+@@ -2,11 +2,13 @@ import argparse
+ from datetime import date
+ from pathlib import Path
+ 
++from spendlog.budget import load_budgets, over_budget
+ from spendlog.models import Expense
+ from spendlog.report import format_report, monthly_totals
+ from spendlog.storage import append_expense, load_expenses
+ 
+ DEFAULT_FILE = Path("expenses.csv")
++DEFAULT_BUDGETS = Path("budgets.toml")
+ 
+ 
+ def build_parser() -> argparse.ArgumentParser:
+@@ -25,6 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
+ 
+     report = sub.add_parser("report", help="monthly totals by category")
+     report.add_argument("month", help="month in YYYY-MM format")
++    report.add_argument("--budgets", type=Path, default=DEFAULT_BUDGETS)
+     return parser
+ 
+ 
+@@ -45,6 +48,8 @@ def main(argv: list[str] | None = None) -> int:
+         year, month = (int(part) for part in args.month.split("-"))
+         totals = monthly_totals(load_expenses(args.file), year, month)
+         print(format_report(totals))
++        for category, excess in over_budget(totals, load_budgets(args.budgets)).items():
++            print(f"WARNING: {category} is {excess:.2f} over budget")
+     return 0
+ 
+ 
+diff --git a/tests/test_budget.py b/tests/test_budget.py
+new file mode 100644
+index 0000000..b5d7d6c
+--- /dev/null
++++ b/tests/test_budget.py
+@@ -0,0 +1,17 @@
++from spendlog.budget import load_budgets, over_budget
++
++
++def test_missing_budget_file_means_no_limits(tmp_path):
++    assert load_budgets(tmp_path / "budgets.toml") == {}
++
++
++def test_load_budgets(tmp_path):
++    path = tmp_path / "budgets.toml"
++    path.write_text("[budgets]\nfood = 300\nfun = 50.5\n", encoding="utf-8")
++    assert load_budgets(path) == {"food": 300.0, "fun": 50.5}
++
++
++def test_over_budget_reports_only_exceeded_categories():
++    totals = {"food": 320.0, "fun": 20.0}
++    budgets = {"food": 300.0, "fun": 50.0, "transport": 80.0}
++    assert over_budget(totals, budgets) == {"food": 20.0}

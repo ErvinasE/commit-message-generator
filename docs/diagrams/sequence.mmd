@@ -1,0 +1,27 @@
+sequenceDiagram
+  actor User
+  participant NB as Notebook
+  participant G as Gemini API
+  participant V as Validator
+
+  Note over User,V: Commit message
+  User->>NB: provide git diff
+  NB->>NB: clean and truncate diff
+  NB->>G: system prompt + diff
+  G-->>NB: candidate message
+  NB->>V: validate(message)
+  alt valid
+    V-->>NB: OK
+  else invalid
+    V-->>NB: errors
+    NB->>G: retry with error feedback (max 2)
+    G-->>NB: corrected message
+  end
+  NB-->>User: final message + attempt trace
+
+  Note over User,V: Changelog
+  User->>NB: provide commit list
+  NB->>G: group and summarize commits
+  G-->>NB: changelog text
+  NB->>NB: coverage check (every hash once)
+  NB-->>User: changelog

@@ -1,0 +1,11 @@
+flowchart LR
+  User([User]) --> Input[(Git diff / commit list)]
+  Input --> Diff[Diff Cleaner]
+  Diff --> Prompt[Prompt Builder]
+  Prompt --> Gemini{{Gemini API}}
+  Gemini --> Valid[Validator]
+  Valid -->|invalid, retry max 2| Prompt
+  Valid -->|valid| Msg[Commit message]
+  Input --> Log[Changelog Builder]
+  Log <--> Gemini
+  Log --> Out[Changelog]

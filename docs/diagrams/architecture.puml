@@ -1,0 +1,25 @@
+@startuml
+title Architecture - Commit Message & Changelog Generator
+
+actor User
+rectangle "Colab notebook" {
+  component "Diff Cleaner" as Diff
+  component "Prompt Builder" as Prompt
+  component "Validator" as Valid
+  component "Changelog Builder" as Log
+}
+cloud "Gemini API" as Gemini
+database "Git diff / commit list" as Input
+
+User --> Input : provide diff or commits
+Input --> Diff : raw diff
+Diff --> Prompt : cleaned diff
+Prompt --> Gemini : system prompt + diff
+Gemini --> Valid : candidate message
+Valid --> Prompt : errors (retry, max 2)
+Valid --> User : valid commit message
+Input --> Log : commit list
+Log --> Gemini : group and summarize
+Gemini --> Log : changelog text
+Log --> User : changelog
+@enduml

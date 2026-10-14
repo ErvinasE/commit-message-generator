@@ -1,0 +1,28 @@
+diff --git a/spendlog/cli.py b/spendlog/cli.py
+index ffcc071..134a9fc 100644
+--- a/spendlog/cli.py
++++ b/spendlog/cli.py
+@@ -20,7 +20,8 @@ def build_parser() -> argparse.ArgumentParser:
+     add.add_argument("--note", default="")
+     add.add_argument("--day", type=date.fromisoformat, default=date.today())
+ 
+-    sub.add_parser("list", help="show recorded expenses")
++    list_cmd = sub.add_parser("list", help="show recorded expenses")
++    list_cmd.add_argument("--category", help="only show expenses in this category")
+ 
+     report = sub.add_parser("report", help="monthly totals by category")
+     report.add_argument("month", help="month in YYYY-MM format")
+@@ -33,7 +34,12 @@ def main(argv: list[str] | None = None) -> int:
+         append_expense(args.file, Expense(args.day, args.amount, args.category, args.note))
+         print(f"Added {args.amount:.2f} to {args.category}")
+     elif args.command == "list":
+-        for e in load_expenses(args.file):
++        expenses = load_expenses(args.file)
++        if args.category:
++            expenses = [e for e in expenses if e.category == args.category]
++        if not expenses:
++            print("No expenses found.")
++        for e in expenses:
+             print(f"{e.day}  {e.amount:>8.2f}  {e.category:<12} {e.note}")
+     elif args.command == "report":
+         year, month = (int(part) for part in args.month.split("-"))

@@ -1,0 +1,43 @@
+diff --git a/README.md b/README.md
+index 04220e5..e09f7a1 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,37 @@
+ # spendlog
+ 
+-A tiny command-line expense tracker.
++A tiny command-line expense tracker. Expenses are stored in a plain CSV file,
++so you can open them in any spreadsheet program.
++
++## Installation
++
++Requires Python 3.10 or newer.
++
++```bash
++pip install .
++```
++
++## Usage
++
++Record an expense (the date defaults to today):
++
++```bash
++spendlog add 12.50 food --note "lunch"
++spendlog add 2.40 transport --day 2026-03-20
++```
++
++List all expenses, or only one category:
++
++```bash
++spendlog list
++spendlog list --category food
++```
++
++Show the totals per category for one month:
++
++```bash
++spendlog report 2026-03
++```
++
++Expenses are saved to `expenses.csv` in the current directory. Pass
++`--file PATH` before the command to use a different file.

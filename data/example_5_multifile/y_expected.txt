@@ -1,0 +1,4 @@
+feat(budget): warn when a category exceeds its monthly budget
+
+Limits are read from budgets.toml (see budgets.example.toml). On
+Python < 3.11 this needs tomli, which is now a dependency.

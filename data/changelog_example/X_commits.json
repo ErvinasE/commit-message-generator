@@ -1,0 +1,54 @@
+[
+  {
+    "hash": "1b674e2",
+    "message": "chore(release): bump version to 0.2.0"
+  },
+  {
+    "hash": "25ea4bf",
+    "message": "ci: run tests on GitHub Actions"
+  },
+  {
+    "hash": "f0e9ae7",
+    "message": "feat(report)!: sort categories by amount instead of name\n\nBREAKING CHANGE: the report now lists the largest categories first.\nScripts that relied on alphabetical order must sort the output."
+  },
+  {
+    "hash": "fc20052",
+    "message": "feat(budget): warn when a category exceeds its monthly budget\n\nLimits are read from budgets.toml (see budgets.example.toml). On\nPython < 3.11 this needs tomli, which is now a dependency."
+  },
+  {
+    "hash": "1e454b8",
+    "message": "docs(readme): add installation and usage instructions"
+  },
+  {
+    "hash": "cd9ff1e",
+    "message": "refactor(storage): extract CSV row conversion into helper functions"
+  },
+  {
+    "hash": "d616a24",
+    "message": "feat(cli): add --category filter to the list command"
+  },
+  {
+    "hash": "c8c7a4b",
+    "message": "fix(report): only count expenses from the requested year\n\nmonthly_totals compared only the month, so the report for 2026-03\nalso included March expenses from earlier years."
+  },
+  {
+    "hash": "7f95539",
+    "message": "test(storage): cover loading and saving expenses"
+  },
+  {
+    "hash": "c2a7198",
+    "message": "feat(report): add monthly totals by category"
+  },
+  {
+    "hash": "6ec9d12",
+    "message": "feat(cli): add commands to record and list expenses"
+  },
+  {
+    "hash": "91837ea",
+    "message": "feat(storage): store expenses in a CSV file"
+  },
+  {
+    "hash": "5bdcffb",
+    "message": "chore: initialize project skeleton"
+  }
+]
