@@ -9,7 +9,7 @@ A university course project: an information system that uses generative AI (the 
 
 Two checks sit on top of the model. A **validator** checks every commit message against the format rules and, if it fails, sends the errors back to the model for up to 2 retries. A **coverage check** makes sure the changelog lists every input commit exactly once and invents none.
 
-The whole prototype is one notebook, [`commit_gen_demo.ipynb`](commit_gen_demo.ipynb). To run it, open it in Colab with the badge above, add your Gemini API key as a Colab secret named `GEMINI_API_KEY` (key icon in the left sidebar), and choose Runtime > Run all.
+The whole prototype is one notebook, [`commit_gen_demo.ipynb`](commit_gen_demo.ipynb). To run it, open it in Colab with the badge above, add your Gemini API key as a Colab secret named `GOOGLE_API_KEY` (key icon in the left sidebar), and choose Runtime > Run all.
 
 ## Repository layout
 
