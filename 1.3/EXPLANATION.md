@@ -4,7 +4,7 @@
 
 | Failas | Kas tai |
 |---|---|
-| `EXPLANATION.md` | šis paaiškinimas: kaip veikia dėstytojo sąsiuviniai, langelis po langelio |
+| `EXPLANATION.md` | šis paaiškinimas: kaip veikia `AdventureWorksDW_*` sąsiuviniai, langelis po langelio |
 | `Telco_Decision_Forests.ipynb` | perdarytas `AdventureWorksDW_Decision_Forests.ipynb` su Kaggle Telco duomenimis |
 | `Telco_NN.ipynb` | perdarytas `AdventureWorksDW_NN.ipynb` su tais pačiais Telco duomenimis |
 | `data/WA_Fn-UseC_-Telco-Customer-Churn.csv` | Kaggle duomenų rinkinys [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn) |
@@ -36,7 +36,7 @@ Abu turi tą pačią struktūrą: 1) duomenys → lentelės, 2) lentelės → Te
 
 ### Antraštė
 
-* **[0]–[1]** Nuoroda į „YouTube“ vaizdo įrašą, autorius (A. Laukaitis) ir nuorodos į AdventureWorks DW schemos paveikslėlius.
+* **[0]–[1]** Nuoroda į „YouTube“ vaizdo įrašą ir nuorodos į AdventureWorks DW schemos paveikslėlius.
 
 ### 1 žingsnis. Iš CSV failo į mokymo ir testavimo lenteles
 
@@ -209,29 +209,11 @@ jo kodavimo sluoksnis, tada viskas sujungiama.
 
 ## Mano versija: Telco klientų nutekėjimas
 
-Abu sąsiuviniai perdaryti su Kaggle duomenų rinkiniu **Telco Customer Churn** (IBM pavyzdiniai duomenys):
-7 043 telekomunikacijų bendrovės klientai, klausimas: **ar klientas išeis** (`Churn`).
-Uždavinys tokio pat tipo kaip AdventureWorks (vienas klientas = viena eilutė, tekstiniai ir skaitiniai požymiai,
-atsakymas taip/ne), todėl visi originalų žingsniai tinka.
-
-| Kas pakeista | Kodėl |
-|---|---|
-| 12 požymių: `gender`, `SeniorCitizen`, `Partner`, `Dependents`, `tenure`, `PhoneService`, `InternetService`, `Contract`, `PaperlessBilling`, `PaymentMethod`, `MonthlyCharges`, `TotalCharges` | tiek pat kaip originale; pašalintas ID ir 7 papildomų paslaugų stulpeliai |
-| `TotalCharges` tekstas → skaičius, 11 tuščių → 0 | CSV faile 11 naujų klientų šis laukas tuščias |
-| Rodomas **bazinis lygis** (~76 %) ir klaidų matrica | išėjusių tik 26,5 %, todėl tikslumas be bazinio lygio klaidina |
-| TF-DF → **YDF** | `tensorflow_decision_forests` neįsidiegia su Colab Python 3.13; YDF yra ta pati „Google“ biblioteka be TensorFlow sluoksnio |
-| `random_state=42` / `set_random_seed(42)` | atkartojami rezultatai; abiejų sąsiuvinių testavimo aibė ta pati |
-| Pataisytas `df_to_dataset` | `target` nebepatenka tarp įėjimų |
-| Pridėtos mokymo kreivės, požymių svarba | rezultatams paaiškinti |
-| Praleista `dtreeviz` dalis | originale neveikė, YDF jos nepalaiko; medis piešiamas su YDF `plot_tree` |
-
-**Rezultatai** (ta pati testavimo aibė, 705 klientai):
+Abu sąsiuviniai perdaryti su Kaggle [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn) duomenimis: 7 043 klientai, ar klientas išeis (`Churn`).
+Paliekama 12 požymių. Sprendimų miškui naudojama YDF, nes TF-DF neįsidiegia su Colab Python 3.13.
 
 | | Sprendimų miškas | Neuroninis tinklas |
 |---|---|---|
 | Tikslumas | 79,3 % | 80,9 % |
-| Bazinis lygis | 75,7 % | 75,7 % |
+| Bazinis lygis (visada „lieka“) | 75,7 % | 75,7 % |
 | Atpažinta išėjusių | 81 iš 171 | 85 iš 171 |
-
-Skirtumas tarp modelių yra apie 11 klientų, t. y. per mažas, kad būtų galima teigti, jog vienas modelis geresnis.
-Svarbiausi požymiai yra sutarties tipas, kliento stažas ir interneto tipas. Išsamiau žr. sąsiuvinių „Išvadas“.

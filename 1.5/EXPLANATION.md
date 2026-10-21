@@ -4,7 +4,7 @@
 
 | Failas | Kas tai |
 |---|---|
-| `EXPLANATION.md` | šis paaiškinimas: kaip veikia abu dėstytojo sąsiuviniai, langelis po langelio |
+| `EXPLANATION.md` | šis paaiškinimas: kaip veikia abu sąsiuviniai, langelis po langelio |
 | `cnn_One_Image_OpenImages.ipynb` | perdarytas `cnn_One_Image.ipynb` su Open Images verslo aplinkos nuotraukomis |
 | `cnn_Transfer_learning_FashionMNIST.ipynb` | perdarytas `cnn_Transfer_learning.ipynb` su Fashion-MNIST prekių nuotraukomis |
 | `data/images/*.jpg`, `data/images.csv` | 6 Open Images nuotraukos (CC BY 2.0) ir jų autoriai / licencijos |
@@ -154,53 +154,15 @@ Ant jo uždedamas naujas `Dense(10)` sluoksnis CIFAR-10 klasėms.
 
 ## Mano versijos
 
-### `cnn_One_Image_OpenImages.ipynb`
+**`cnn_One_Image_OpenImages.ipynb`**: 6 verslo aplinkos nuotraukos iš Open Images (CC BY 2.0). Klasifikavimui
+EfficientNetV2-S ir MobileNetV3-Large (`keras.applications`), aptikimui tas pats SSD MobileNet V2 Open Images V4,
+segmentavimui DeepLabV3 (ADE20K). Modeliai parsisiunčiami iš TensorFlow modelių saugyklos, ne per TF Hub.
 
-Vietoj Wikimedia nuotraukų naudojamos **6 verslo aplinkos nuotraukos** iš „Google“ duomenų rinkinio
-[Open Images](https://storage.googleapis.com/openimages/web/index.html) (validavimo dalis, licencija CC BY 2.0):
-kavinė iš lauko, biuras, parduotuvė, vaisių prekystalis, gatvė su transportu, kavinė viduje. Nuotraukos saugomos
-`data/images/`, o jų autoriai ir nuorodos yra `data/images.csv`. Savo nuotraukas galima pridėti į tą patį aplanką ir CSV.
-
-| Kas pakeista | Kodėl |
-|---|---|
-| Klasifikatoriai: `keras.applications` **EfficientNetV2-S** (384×384) ir **MobileNetV3-Large** (224×224), abu ImageNet-1k | palyginimas „didelis ir tikslus“ prieš „mažas ir greitas“; nereikia `tensorflow_hub` |
-| Detektorius: **tas pats** SSD MobileNet V2 Open Images V4, bet parsisiunčiamas kaip `SavedModel` archyvas iš TensorFlow modelių saugyklos | TF Hub dabar nukreipia į Kaggle; klasių pavadinimai iš `data/oid_v4_labels.csv` |
-| Segmentavimas: **DeepLabV3 MobileNetV2**, **tos pačios** ADE20K 150 klasių | HRNet pasiekiamas tik per TF Hub; DeepLab yra TF1 „užšaldytas grafas“, įkeliamas su `tf.compat.v1.wrap_function` |
-| Papildomai: klasifikavimo lentelė ir detektorius visoms 6 nuotraukoms | matyti, kaip modeliai veikia su visu nuotraukų rinkiniu |
-| 16 didžiausių klasių žemėlapiai vietoj visų 151; 4 uždedamos klasės parenkamos automatiškai; spalvotas segmentavimo žemėlapis | įskaitomumas; veikia su bet kuria nuotrauka |
-| Segmentavimas atliekamas visai nuotraukai, ne iškarpai | originale `image` buvo perrašytas iškarpa |
-
-**Rezultatai (gatvės nuotrauka):**
-* klasifikavimas: abu modeliai sako `cab` (76 % / 80 %), iškarpoje su motoroleriu `moped` (77 % / 34 %);
-* aptikimas: 2 automobiliai, taksi, dviratis, žmogus, ratas; autobusų ir daugumos pėsčiųjų nerado;
-  vaisių prekystalyje nerado nieko (modelis pats atmeta radinius su tikimybe < 30 %);
-* segmentavimas: automobilis 30 %, pastatas 20 %, medis 17 %, kelias 13 %, žmogus 5 % ploto; didelę autobuso dalį
-  modelis pažymėjo kaip automobilį.
-
-Mažesnis klasifikatorius ir greiti „mobilūs“ detekcijos / segmentavimo modeliai daro pastebimai daugiau klaidų nei dideli.
-
-### `cnn_Transfer_learning_FashionMNIST.ipynb`
-
-Naudojami tie patys 6 000 + 1 000 **Fashion-MNIST** prekių nuotraukų kaip 1.4 užduotyje, todėl perkeliamąjį mokymąsi
-galima tiesiogiai palyginti su tinklu, mokytu nuo nulio.
-
-| Kas pakeista | Kodėl |
-|---|---|
-| `keras.applications.EfficientNetV2B1` (ImageNet-1k) vietoj TF Hub `KerasLayer` (ImageNet-21k) | tas pats tinklas, veikia su Keras 3 be `tf_keras` |
-| 1 kanalas nukopijuojamas į 3, taškai paliekami 0–255 | EfficientNet tikisi spalvotų nuotraukų; Keras versija pati normalizuoja |
-| `validation_split=0.1` vietoj testavimo aibės | testavimo aibė lieka tik galutiniam įvertinimui |
-| 5 epochos (užšaldytas) + 3 epochos (derinimas) vietoj 20 + 200 | pakanka parodyti efektą; originalo 200 epochų truko ~7 val. |
-| Derinant `BatchNormalization` sluoksniai lieka užšaldyti, modelis iš naujo kompiliuojamas | Keras rekomendacija; kitaip sugadinama ImageNet statistika |
-| Papildymas per `tf.data` kiekvienam paketui | kiekvienoje epochoje kitokios nuotraukos, nereikia 100 kartų įkelti duomenų |
-| `.keras` failas vietoj `SavedModel` + ZIP | Keras 3 formatas |
-
-**Rezultatai (1 000 testavimo nuotraukų):**
+**`cnn_Transfer_learning_FashionMNIST.ipynb`**: tie patys Fashion-MNIST duomenys kaip 1.4, EfficientNetV2-B1 iš
+`keras.applications` (veikia su Keras 3 be `tf_keras`).
 
 | Modelis | Tikslumas |
 |---|---|
 | CNN nuo nulio (1.4) | 85,2 % |
 | EfficientNetV2-B1 užšaldytas | 87,7 % |
-| + derinimas su papildytais duomenimis | **89,1 %** |
-
-Kaip ir originale, pirmoje derinimo epochoje validavimo tikslumas nukrito (87 % → 80 %), o vėliau pakilo aukščiau
-pradinio (88,5 %). Pagerėjimas mažesnis nei su CIFAR-10, nes 28×28 nespalvotos nuotraukos labai skiriasi nuo ImageNet nuotraukų.
+| + derinimas su papildytais duomenimis | 89,1 % |

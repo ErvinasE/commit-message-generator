@@ -4,7 +4,7 @@
 
 | Failas | Kas tai |
 |---|---|
-| `EXPLANATION.md` | šis paaiškinimas: kaip veikia dėstytojo sąsiuvinis `cnn.ipynb`, langelis po langelio |
+| `EXPLANATION.md` | šis paaiškinimas: kaip veikia `cnn.ipynb`, langelis po langelio |
 | `cnn_FashionMNIST.ipynb` | perdarytas sąsiuvinis su Fashion-MNIST prekių nuotraukomis |
 | `data/fashion-mnist_train.csv.gz`, `data/fashion-mnist_test.csv.gz` | 6 000 + 1 000 Fashion-MNIST nuotraukų CSV formatu (Kaggle stulpeliai) |
 
@@ -124,34 +124,13 @@ todėl su panašiu parametrų skaičiumi pasiekia **70 % vietoje 43 %**.
 
 ---
 
-## Mano versija: Fashion-MNIST („Zalando“ prekių nuotraukos)
+## Mano versija: Fashion-MNIST
 
-Sąsiuvinis `cnn_FashionMNIST.ipynb` turi tas pačias tris dalis, bet naudoja Kaggle duomenų rinkinį
-[Fashion-MNIST](https://www.kaggle.com/datasets/zalando-research/fashionmnist): „Zalando“ el. parduotuvės prekių
-nuotraukos, 10 klasių (marškinėliai, kelnės, megztinis, suknelė, paltas, sandalas, marškiniai, sportbatis, rankinė,
-aulinukas), 28×28 taškų, nespalvotos. Kaggle šie duomenys yra CSV failai: `label` + 784 taškų stulpeliai.
-Paimta subalansuota dalis: po 600 mokymo ir 100 testavimo nuotraukų kiekvienai klasei (6 000 + 1 000).
-Nuotraukos atrinktos iš originalių „Zalando“ failų ir išsaugotos tokiu pačiu CSV formatu kaip Kaggle.
-
-| Kas pakeista | Kodėl |
-|---|---|
-| CSV eilutė → `reshape(-1, 28, 28, 1)` | duomenys CSV formatu, 1 kanalas (nespalvotos) |
-| `Input(shape=(28, 28, 1))` | kitas nuotraukų dydis; be Keras įspėjimo |
-| `validation_split=0.1` vietoje testavimo aibės | testavimo aibė lieka tik galutiniam įvertinimui |
-| Rodomi visi 32 filtrai ir 32 žemėlapiai | vienas kanalas, todėl telpa |
-| Palyginamas visas žemėlapis ir didžiausias skirtumas | originalo `[:6, :6]` palyginimas rodė tik nulius |
-| Klaidų matrica | matyti, kurias prekes tinklas painioja |
-| `keras.utils.set_random_seed(42)` | atkartojami rezultatai |
-
-**Rezultatai:**
+`cnn_FashionMNIST.ipynb`: tos pačios trys dalys su Kaggle [Fashion-MNIST](https://www.kaggle.com/datasets/zalando-research/fashionmnist) („Zalando“ prekių nuotraukos, 28×28, nespalvotos, 10 klasių),
+6 000 + 1 000 nuotraukų CSV formatu.
 
 | | CNN | MLP |
 |---|---|---|
-| Tikslumas su testavimo aibe | **85,2 %** | 81,1 % |
-| Parametrų | 93 322 | 32 042 |
+| Tikslumas | 85,2 % | 81,1 % |
 
-* CNN vėl geresnis, bet skirtumas mažesnis nei su CIFAR-10 (4 vietoje 27 procentinių punktų): Fashion-MNIST nuotraukose
-  daiktas visada centre ir juodame fone, todėl net MLP daug ką atspėja.
-* Ranka apskaičiuotas požymių žemėlapis sutapo su Keras žemėlapiu (didžiausias skirtumas ~4·10⁻⁸, apvalinimo paklaida).
-* Sunkiausiai atpažįstami paltai, marškiniai ir megztiniai: mažoje nespalvotoje nuotraukoje jie labai panašūs.
-* Su 5 400 mokymo nuotraukų CNN pradeda persimokyti maždaug nuo 8 epochos.
+CNN vėl geresnis, bet skirtumas mažesnis nei su CIFAR-10, nes daiktas visada centre ir juodame fone.
