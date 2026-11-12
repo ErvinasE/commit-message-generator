@@ -23,7 +23,8 @@ data/                     (X, y) examples: X = input, y = expected output
   example_5_multifile/
   changelog_example/        X_commits.json, y_expected_CHANGELOG.md
 prompts/
-  system_prompt.md          the system instruction the notebook sends to Gemini
+  system_prompt.md          the system instruction for commit messages
+  changelog_prompt.md       the system instruction for the changelog
   test_prompt.md            a self-contained test prompt, with an AI agent's answer
 docs/
   diagram_prompt.md         the prompt used to design the system
@@ -38,7 +39,7 @@ The examples are synthetic. They come from a small Python project, `spendlog` (a
 
 ### `prompts/`
 
-`system_prompt.md` is the exact system instruction the notebook reads and sends to Gemini. Its two worked examples are unrelated to the diffs in `data/`.
+`system_prompt.md` and `changelog_prompt.md` are the exact system instructions the notebook reads and sends to Gemini, one per job. The two worked examples in `system_prompt.md` are unrelated to the diffs in `data/`.
 
 `test_prompt.md` lets you test the prompt without the notebook. Copy everything above the "Expected output (y)" heading into any AI assistant; it should answer with a commit message. The expected answer and the AI agent's actual answer are recorded under the last two headings.
 
